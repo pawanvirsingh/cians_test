@@ -144,7 +144,7 @@ function downloadCSV(){
                 JSONToCSVConvertor(result.data, true, "Job Record")
              }
              else{
-                alert("Error in Download Data")
+                alert(result.message)
              }
          }
      });  

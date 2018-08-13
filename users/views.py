@@ -1,7 +1,7 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from users.models import JobFinder
+from users.models import JobFinder,ThortalDownload
 from rest_framework.decorators import api_view
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -56,9 +56,23 @@ def show_data(request):
             return Response({"data":job_data_seri.data, "success": True})
 
     else:
-        job_user_data = JobFinder.objects.all()
-        job_data_seri = JobFinderSerializer(job_user_data, many=True)
-        return Response({"data":job_data_seri.data, "success": True})
+        download_limiter = ThortalDownload.objects.filter(user = request.user).first()
+        if download_limiter:
+            count = download_limiter.download_count
+            if count < download_limiter.download_allowd:
+                download_limiter.download_count= count+1
+                download_limiter.save()
+                job_user_data = JobFinder.objects.all()
+                job_data_seri = JobFinderSerializer(job_user_data, many=True)
+                return Response({"data":job_data_seri.data, "success": True})
+            else:
+                return Response({"data":[], "success": False,"message":"you reached maximum downlaod"})
+        else:
+            obj_throtal = ThortalDownload(user=request.user,download_count=1)
+            obj_throtal.save()
+            job_user_data = JobFinder.objects.all()
+            job_data_seri = JobFinderSerializer(job_user_data, many=True)
+            return Response({"data":job_data_seri.data, "success": True})
 
 
 

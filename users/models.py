@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from datetime import date
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class JobFinder(models.Model):
@@ -19,4 +20,12 @@ class JobFinder(models.Model):
     skills = models.CharField(max_length=255, null=True)
     experience = models.FloatField(null=True)
 
-    
+class ThortalDownload(models.Model):
+    user = models.ForeignKey(User)
+    download_count = models.IntegerField(default=0)
+    download_allowd = models.IntegerField(default=5)
+    last_download = models.DateTimeField(auto_now=True)
+
+    # def increase_count(self):
+    #     download_count = self.download_count+1
+    #     self.save()
