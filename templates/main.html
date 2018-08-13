@@ -1,0 +1,199 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+  	$(document).ready(function(){
+
+    var tg = new Date()
+    $.ajax({
+      url: "http://localhost:8000/ajaxrequest/",
+      method: "GET",
+      contentType: "application/json",
+      success:function(data, exception, jqXHR)  {
+        item = ""
+        info = "<tr>"
+        hm = "<tr><th>Name</th><th>Mobile</th><th>Email</th><th>Skills</th><th>Experience</th></tr>"
+        if (data.data.length==0){
+          $('#res').html(hm);
+        }
+        $.each(data.data, function(i, item) {
+          info = info+"<th>"+item["name"]+"</th>"+"<th>"+item["mobile"]+"</th>"+"<th>"+item["email"]+"</th>"+"<th>"+item["skills"]+"</th>"+"<th>"+item["experience"]+"</th></tr>"
+          $("#res").clear;
+          $('#res').html(hm+info);
+          });
+        }
+      });
+
+      function loadData(search){
+        document.getElementById("res").innerText=""
+        $.ajax({
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          url: "http://localhost:8000/ajaxrequest/",
+          method: "POST",
+          cache: false,
+          async: true,
+          data: JSON.stringify({"skills": search}),
+          contentType: "application/json",
+          success:function(data, exception, jqXHR)  {
+            item = ""
+            info = "<tr>"
+            hm = "<tr><th>Name</th><th>Mobile</th><th>Email</th><th>Skills</th><th>Experience</th></tr>"
+            if (data.data.length==0){
+              $('#res').html(hm);
+            }
+            $.each(data.data, function(i, item) {
+              info = info+"<th>"+item["name"]+"</th>"+"<th>"+item["mobile"]+"</th>"+"<th>"+item["email"]+"</th>"+"<th>"+item["skills"]+"</th>"+"<th>"+item["experience"]+"</th></tr>"
+              $("#res").clear;
+              $('#res').html(hm+info);
+              });
+            }
+          });
+        }
+        $('#search_text').on("change paste keyup",function(){
+          var t1 = new Date();
+          console.log("T1: "+t1)
+          var search = $(this).val();
+          console.log("Search text : "+search);
+          $("#result").text("Enter Key");
+          if(search != '' && search.length>0)
+          {
+           console.log("TG: "+tg)
+           td = t1-tg
+           console.log(td)
+           if (td>200){
+            loadData(search); 
+           }
+           tg = t1
+           console.log("TG2: "+tg)
+           $("#result").text(search)
+          }
+          else
+          {
+           $('#res').html("<tr><th>First Name</th><th>Mobile</th><th>Email</th><th>Skills</th><th>Experience</th></tr>");
+          }
+      });
+
+  });
+
+
+function JSONToCSVConvertor(JSONData,ShowLabel, fileName) {    
+		var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;   
+		var CSV = '';     
+		if (ShowLabel) {
+			 var row = "";
+			 for (var index in arrData[0]) {
+					 row += index + ',';
+			 }
+			 row = row.slice(0, -1);
+			 CSV += row + '\r\n';
+		}
+		for (var i = 0; i < arrData.length; i++) {
+			 var row = "";
+			 for (var index in arrData[i]) {
+					var arrValue = arrData[i][index] == null ? "" : '="' + arrData[i][index] + '"';
+					row += arrValue + ',';
+			 }
+			 row.slice(0, row.length - 1);
+			 CSV += row + '\r\n';
+		}
+		if (CSV == '') {        
+			 growl.error("Invalid data");
+			 return;
+		}   
+		if(msieversion()){
+		var IEwindow = window.open();
+		IEwindow.document.write('sep=,\r\n' + CSV);
+		IEwindow.document.close();
+		IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
+		IEwindow.close();
+		} else {
+		 var uri = 'data:application/csv;charset=utf-8,' + escape(CSV);
+		 var link = document.createElement("a");    
+		 link.href = uri;
+		 link.style = "visibility:hidden";
+		 link.download = fileName + ".csv";
+		 document.body.appendChild(link);
+		 link.click();
+		 document.body.removeChild(link);
+		}
+	}
+	function msieversion() {
+		var ua = window.navigator.userAgent; 
+		var msie = ua.indexOf("MSIE "); 
+		if (msie != -1 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) // If Internet Explorer, return version number 
+		{
+			return true;
+		} else { // If another browser, 
+			return false;
+		}
+			return false; 
+	}
+
+
+function downloadCSV(){
+     $.ajax({
+             headers: {'X-CSRFToken': '{{ csrf_token }}'},
+             url: "http://localhost:8000/ajaxrequest/", 
+             type: "get",
+             success: function(result){
+             if (result.success){
+                JSONToCSVConvertor(result.data, true, "Job Record")
+             }
+             else{
+                alert("Error in Download Data")
+             }
+         }
+     });  
+ }
+
+</script>
+<style>
+table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text
+}
+tr:nth-child(even){background-color: #f2f2f2;}
+tr:hover {background-color: #ddd;}
+
+</style>
+
+
+</head>
+<body>
+
+  <h3 id="result"></h3>
+  <input type="text" name="search_text" id="search_text" placeholder="Search by serialNo
+resume,
+name,
+email,
+mobile,
+current_address,
+corrected_address,
+nearest_city,
+prefered_location,
+company_current,
+ctc,
+designation,
+skills" class="w3-input"/>
+
+ <button type="button" onclick="downloadCSV();" id="txt">
+    Download disaster CSV file
+ </button>
+ <button type="button">
+  <a href="http://localhost:8000/logout/">Logout</a>
+  </button>
+
+<table id="res"></table>
+</body>
+</html>
