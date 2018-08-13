@@ -137,7 +137,7 @@ function JSONToCSVConvertor(JSONData,ShowLabel, fileName) {
 function downloadCSV(){
      $.ajax({
              headers: {'X-CSRFToken': '{{ csrf_token }}'},
-             url: "http://localhost:8000/ajaxrequest/", 
+             url: "http://localhost:8000/show_data_counter_download/", 
              type: "get",
              success: function(result){
              if (result.success){

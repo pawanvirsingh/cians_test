@@ -26,7 +26,9 @@ urlpatterns = [
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'template_name': 'logged_out.html'}, name='logout'),
-    url(r'^home/$', TemplateView.as_view(template_name='main.html'), name='home'),
-    url(r'^ajaxrequest/$', views.show_data, name='ajaxrequest'),
+    url(r'^home$', TemplateView.as_view(template_name='main.html'), name='home'),
+    url(r'^ajaxrequest/$', views.show_data, name='show_data'),
+    url(r'^show_data_counter_download/$', views.show_data_counter_download, name='show_data_counter_download'),
+    
 ]
 

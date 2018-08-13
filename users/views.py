@@ -54,8 +54,16 @@ def show_data(request):
             job_user_data = JobFinder.objects.all()
             job_data_seri = JobFinderSerializer(job_user_data, many=True)
             return Response({"data":job_data_seri.data, "success": True})
-
     else:
+        job_user_data = JobFinder.objects.all()
+        job_data_seri = JobFinderSerializer(job_user_data, many=True)
+        return Response({"data":job_data_seri.data, "success": True})
+
+@csrf_exempt
+@login_required
+@api_view(['GET', 'POST'])
+def show_data_counter_download(request):
+
         download_limiter = ThortalDownload.objects.filter(user = request.user).first()
         if download_limiter:
             count = download_limiter.download_count
@@ -73,9 +81,4 @@ def show_data(request):
             job_user_data = JobFinder.objects.all()
             job_data_seri = JobFinderSerializer(job_user_data, many=True)
             return Response({"data":job_data_seri.data, "success": True})
-
-
-
-
-
 
